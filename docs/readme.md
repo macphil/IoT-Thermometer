@@ -31,11 +31,31 @@ Zuerst habe ich für einige Dinge per Prototyping die Machbarkeit geprüft.
 
 Nun muss ich mir eine sinvolle Ordnerstruktur überlegen.
 
----
+
+
+# Use-Cases
+
+Nagt, es sind keine Use-Cases in strengen UML-Sinne, aber es beschreibt, wie die KOmponenten zusammenarbeiten sollen.
+
+## Temperatur[^1] loggen
+
+Alle 60 Sekunden ermittelt der ESP8226 mithilfe des DHT22 die aktuelle Temperatur und sendet diese dann per HTTP-POST an den REST-Service. Dort wird der Wert dann in der RRD gespeichert.
+
+![iott_post](iott_post.png)
+
+## letzte Temperatur anzeigen
+
+Wenn die entsprechende Webseite aufgerufen wird, wird mittels [JavaScript Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) ein asynchroner Request abgesetzt, welcher ein Json zurückbekommt. So aktualisiert sich die Webseite neu, wobei nur das kleine Json neu abgerufen werden muss. 
+
+ ![iott_get](iott_get.png)
+
+## Grafiken erstellen
+
+Per crnjob (z.B. alle 5 Minuten) wird die Generierung der Verlaufsgrafik angestoßen
+
+![iott_put](iott_put.png)
 
 
 
 
-
-
-
+[^1]: Wenn ich von Temperatur rede, gilt dies üblicherweise ebenso auch für die Luftfeuchtigkeit, welcher der Sensor ebenfalls ermittelt
