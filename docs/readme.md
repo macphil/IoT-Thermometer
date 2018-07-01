@@ -35,7 +35,7 @@ Nun muss ich mir eine sinvolle Ordnerstruktur überlegen.
 
 # Use-Cases
 
-Nagt, es sind keine Use-Cases in strengen UML-Sinne, aber es beschreibt, wie die KOmponenten zusammenarbeiten sollen.
+Nagt, es sind keine Use-Cases in strengen UML-Sinne, aber es beschreibt, wie die Komponenten zusammenarbeiten sollen.
 
 ## Temperatur[^1] loggen
 
