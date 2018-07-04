@@ -43,6 +43,18 @@ Alle 60 Sekunden ermittelt der ESP8226 mithilfe des DHT22 die aktuelle Temperatu
 
 ![iott_post](iott_post.png)
 
+### JSON
+
+```json
+{ 
+	"name" : "DHT22_1", 
+	"temperature" : "28.8", 
+	"humidity" : "46.2" 
+}
+```
+
+
+
 ## letzte Temperatur anzeigen
 
 Wenn die entsprechende Webseite aufgerufen wird, wird mittels [JavaScript Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) ein asynchroner Request abgesetzt, welcher ein Json zurückbekommt. So aktualisiert sich die Webseite neu, wobei nur das kleine Json neu abgerufen werden muss. 
