@@ -11,8 +11,8 @@ class HTTPResponse
     protected function SendHeaders($HTTPStatuscode)
     {
         header("HTTP/1.0 " . $HTTPStatuscode);
-        header(ContentType);
-        header(AccessControl);
+        header(self::ContentType);
+        header(self::AccessControl);
     }
 
     public static function Ok200($message)

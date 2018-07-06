@@ -1,4 +1,5 @@
 <?php
+    date_default_timezone_set('Europe/Berlin');
     define('RRDFILE', 'db/temp_rh.rrd');
 
     include 'classes/request.class.php';
@@ -26,12 +27,13 @@
                 }
                 $temperature = $request->getContent()['temperature'];
                 $humidity = $request->getContent()['humidity'];
+                $timesstamp = $request->getContent()['timestamp'];
 
                 if(!IsValidLogValue($temperature, $humidity))
                 {
                     HTTPResponse::Error400(array('the given values are not valid!' => $request->getContent()));
                 }
-                $response = RRDUpdate(floatval($temperature), floatval($humidity)); 
+                $response = RRDUpdate(floatval($temperature), floatval($humidity), intval($timesstamp)); 
                 if($response['status'] == "ok")
                 {
                     HTTPResponse::Ok200('ok');
@@ -39,12 +41,14 @@
                 HTTPResponse::Error500($response);
                 break;
 
-            case 'PATCH':
-                // break;
-                // rrdgraph
             case 'PUT':
-                // break;
-                // rrdtool create
+                $response = RRDGraph("1000s");
+                if($response['status'] == "ok")
+                {
+                    HTTPResponse::Ok200($response);
+                }
+                HTTPResponse::Error500($response);       
+                break;
             default:
                 HTTPResponse::Error405("GET, POST");
                 break;
@@ -82,7 +86,7 @@
         }
         else
         {
-            $response = array('status' => 'error', 'returnVar' => $returnVar, 'output' => $output);
+            $response = array('status' => 'error', 'returnVar' => $returnVar, 'command' => $command, 'output' => $output);
         }
         
         return $response;
@@ -102,9 +106,41 @@
         }
         else
         {
-            $response = array('status' => 'error', 'returnVar' => $returnVar, 'output' => $output);
+            $response = array('status' => 'error', 'returnVar' => $returnVar, 'command' => $command, 'output' => $output);
         }
         
+        return $response;
+    }
+
+    function RRDGraph($start)
+    {
+        putenv("TZ=" . date_default_timezone_get());
+        $now = new DateTime();
+        $command  = "rrdtool graph img/$start.png";
+        $command .= " --start -$start";
+        $command .= " --title 'Temperatur ($start)'";
+        $command .= " --vertical-label 'Grad Celsius'";
+        $command .= sprintf(" --watermark 'last update: %s '", $now->format(DateTime::ATOM));
+        $command .= " --font WATERMARK:8 ";
+        $command .= " --font LEGEND:8:Mono";
+        $command .= " --imgformat PNG";
+        //$command .= " DEF:a0=" . constant('RRDFILE') . ":temp:AVERAGE";
+        $command .= " DEF:a0=" . constant('RRDFILE') . ":temp:AVERAGE";
+        $command .= " VDEF:a0cur=a0,LAST";
+        $command .= " LINE1:a0#0000FF:temp";
+
+        
+        $exec = exec($command, $output, $returnVar);
+        if($returnVar == 0)
+        {
+            $response = array('status' => 'ok', 'command' => $command);
+        }
+        else
+        {
+            $response = array('status' => 'error', 'returnVar' => $returnVar, 'command' => $command, 'output' => $output);
+        }
+        
+        //$response = array('status' => 'ok');
         return $response;
     }
 
