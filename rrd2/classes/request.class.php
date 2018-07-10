@@ -45,10 +45,19 @@ class Request
     {
         if($this->queryParams === null)
         {
-            $this->queryParams = ($_SERVER['QUERY_STRING']);
+            $this->queryParams = ($_GET);
         }
         return $this->queryParams;
     }
+
+    public function getQueryParam($key)
+    {
+        if($this->queryParams === null)
+        {
+            $this->queryParams = ($_GET);
+        }
+        return @$this->queryParams[$key];
+    }    
 
     public function getUri()
     {

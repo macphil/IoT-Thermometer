@@ -2,6 +2,8 @@
     date_default_timezone_set('Europe/Berlin');
     define('RRDFILE', 'db/temp_rh.rrd');
 
+    define('API_KEY', '1DFKTYNKSTGD38UX');
+
     include 'classes/request.class.php';
     include 'classes/HTTPResponse.class.php';
 
@@ -9,25 +11,39 @@
 
     function Handle($request)
     {
+        /*
+        $logdate = new DateTime();
+        $debug = print_r($request->__debugInfo(), true);
+        $logEntry = $logdate->format(DateTime::ATOM) . ": $debug " . PHP_EOL;
+        file_put_contents("/var/www/html/rrd2/debug.log", $logEntry, FILE_APPEND);
+        */
         switch ($request->getMethod()) 
-        {
+        { 
             case 'GET':
-                $response = RRDLastUpdate();
-                if($response['status'] == "ok")
-                {
-                    HTTPResponse::Ok200($response['lastupdate']);
-                }
-                HTTPResponse::Error500($response);       
+                GetLastUpdate();
                 break;
 
             case 'POST':
-                if(!$request->isJson())
+                if($request->getQueryParam("api_key") == constant('API_KEY'))
                 {
-                    HTTPResponse::Error400("the Request is not an valid json.");
+                    $temperature = $request->getQueryParam('temperature');
+                    $humidity = $request->getQueryParam('humidity');
+                    $timesstamp = $request->getQueryParam('timestamp');
+                    if($temperature == null || $humidity == null)
+                    {
+                        HTTPResponse::Error400(array('the request is not valid!' => $request->getQueryParams()));
+                    }                                     
                 }
-                $temperature = $request->getContent()['temperature'];
-                $humidity = $request->getContent()['humidity'];
-                $timesstamp = $request->getContent()['timestamp'];
+                if($request->isJson())
+                {
+                    $temperature = $request->getContent()['temperature'];
+                    $humidity = $request->getContent()['humidity'];
+                    $timesstamp = $request->getContent()['timestamp'];
+                    if($temperature == null || $humidity == null)
+                    {
+                        HTTPResponse::Error400("the Request is not an valid json.");
+                    }
+                }
 
                 if(!IsValidLogValue($temperature, $humidity))
                 {
@@ -36,13 +52,13 @@
                 $response = RRDUpdate(floatval($temperature), floatval($humidity), intval($timesstamp)); 
                 if($response['status'] == "ok")
                 {
-                    HTTPResponse::Ok200('ok');
+                    GetLastUpdate();
                 }
                 HTTPResponse::Error500($response);
                 break;
 
             case 'PUT':
-                $response = RRDGraph("1000s");
+                $response = RRDGraph("1h");
                 if($response['status'] == "ok")
                 {
                     HTTPResponse::Ok200($response);
@@ -53,6 +69,16 @@
                 HTTPResponse::Error405("GET, POST");
                 break;
         }
+    }
+
+    function GetLastUpdate()
+    {
+        $response = RRDLastUpdate();
+        if($response['status'] == "ok")
+        {
+            HTTPResponse::Ok200($response['lastupdate']);
+        }
+        HTTPResponse::Error500($response);    
     }
 
 
