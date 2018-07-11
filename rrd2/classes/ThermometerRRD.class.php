@@ -52,15 +52,22 @@ class ThermometerRRD
         $now = new DateTime();
         $command  = "rrdtool graph $filename";
         $command .= " --start -$start";
-        $command .= " --title 'Temperatur ($start)'";
+        $command .= " --title 'Temperatur & rel. Luftfeuchte ($start)'";
         $command .= " --vertical-label 'Grad Celsius'";
+        $command .= " --right-axis-label 'Rel %'";
+        $command .= " --right-axis 2:0";
         $command .= sprintf(" --watermark 'created at %s '", $now->format(DateTime::ATOM));
         $command .= " --font WATERMARK:8 ";
         $command .= " --font LEGEND:8:Mono";
         $command .= " --imgformat PNG";
+        $command .= " DEF:a1=" . ThermometerRRD::RRDFILE . ":rh:AVERAGE";
+        $command .= " CDEF:a2=a1,0.5,*";
+        $command .= " VDEF:a1cur=a1,LAST";
+        $command .= " AREA:a2#00ff00:humidity";             
         $command .= " DEF:a0=" . ThermometerRRD::RRDFILE . ":temp:AVERAGE";
         $command .= " VDEF:a0cur=a0,LAST";
-        $command .= " LINE1:a0#0000FF:temp";
+        $command .= " LINE1:a0#000000:temperature";
+   
         
         exec($command, $output, $returnVar);
         if($returnVar == 0)
