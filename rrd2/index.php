@@ -19,10 +19,15 @@
         */
         switch ($request->getMethod()) 
         { 
+            // ==
+            // == RRDLastUpdate
+            // ==
             case 'GET':
                 GetLastUpdate();
                 break;
-
+            // ==
+            // == RRDUpdate
+            // ==
             case 'POST':
                 if($request->getQueryParam("api_key") == constant('API_KEY'))
                 {
@@ -56,17 +61,54 @@
                 }
                 HTTPResponse::Error500($response);
                 break;
-
+            // ==
+            // == RRDGraph
+            // ==
             case 'PUT':
-                $response = RRDGraph("1h");
+                if($request->isJson())
+                {
+                    $start = $request->getContent()['start'];
+                    if($start == null)
+                    {
+                        $start = "1h";
+                    }
+                }            
+                $response = RRDGraph($start);
                 if($response['status'] == "ok")
                 {
-                    HTTPResponse::Ok200($response);
+                    $url = sprintf("http://%s%s/%s",
+                        $_SERVER['SERVER_ADDR'],
+                        dirname($_SERVER['REQUEST_URI']),
+                        $response['filename']);
+                    
+                    HTTPResponse::Ok200(array("status" => "ok", "url" => $url));
                 }
                 HTTPResponse::Error500($response);       
                 break;
+            // ==
+            // == RRDCreate
+            // ==
+            case 'PATCH':
+                if($request->isJson())
+                {
+                    $start = $request->getContent()['override'];
+                    if($start == "true")
+                    {
+                        $response = RRDCreate();
+                        if($response['status'] == "ok")
+                        {
+                            HTTPResponse::Ok200($response);
+                        }
+                        HTTPResponse::Error500($response);  
+                    }
+                }   
+                HTTPResponse::Error400("to confirm override, {'override':'true'} must be send!");  
+                break; 
+            case 'DELETE':
+                HTTPResponse::Error418($request->__debugInfo());
+                break;               
             default:
-                HTTPResponse::Error405("GET, POST");
+                HTTPResponse::Error405("GET, POST, PUT, PATCH");
                 break;
         }
     }
@@ -101,10 +143,7 @@
         {
             $timesstamp = time();
         }
-        $command = "rrdtool update " . constant('RRDFILE') ." $timesstamp:$temperature:$humidity";
-        // dir must be writable!
-        //$command = "rrdtool create " . constant('RRDFILE') ." --step 60 DS:temp:GAUGE:120:U:U DS:rh:GAUGE:120:10:110 RRA:AVERAGE:0.5:5:576";
-        
+        $command = "rrdtool update " . constant('RRDFILE') ." $timesstamp:$temperature:$humidity";   
         $exec = exec($command, $output, $returnVar);
         if($returnVar == 0)
         {
@@ -138,11 +177,51 @@
         return $response;
     }
 
+    function RRDCreate()
+    {
+        // dir must be writable!
+        if(!is_writable(constant('RRDFILE')))
+        {
+            $response = array('status' => 'error', 'msg' => constant('RRDFILE') . " is not writable!");
+        }
+
+        $command  = "rrdtool create " .  constant('RRDFILE');
+        $command .= " --step 60 ";
+        $command .= "DS:temp:GAUGE:240:U:U ";
+        $command .= "DS:rh:GAUGE:240:10:110 ";
+        $command .= "RRA:AVERAGE:0.5:1:1440 ";
+        $command .= "RRA:AVERAGE:0.5:30:432 ";
+        $command .= "RRA:AVERAGE:0.5:120:540 ";
+        $command .= "RRA:AVERAGE:0.5:1440:450 ";
+        $command .= "RRA:MAX:0.5:1:1440 ";
+        $command .= "RRA:MAX:0.5:30:432 ";
+        $command .= "RRA:MAX:0.5:120:540 ";
+        $command .= "RRA:MAX:0.5:1440:450 ";
+        $command .= "RRA:MIN:0.5:1:1440 ";
+        $command .= "RRA:MIN:0.5:30:432 ";
+        $command .= "RRA:MIN:0.5:120:540 ";
+        $command .= "RRA:MIN:0.5:1440:450 ";
+
+        
+        $exec = exec($command, $output, $returnVar);
+        if($returnVar == 0)
+        {
+            $response = array('status' => 'ok', 'command' => $command);
+        }
+        else
+        {
+            $response = array('status' => 'error', 'returnVar' => $returnVar, 'command' => $command, 'output' => $output);
+        }
+
+        return $response;  
+    }
+
     function RRDGraph($start)
     {
         putenv("TZ=" . date_default_timezone_get());
+        $filename = "img/$start.png";
         $now = new DateTime();
-        $command  = "rrdtool graph img/$start.png";
+        $command  = "rrdtool graph $filename";
         $command .= " --start -$start";
         $command .= " --title 'Temperatur ($start)'";
         $command .= " --vertical-label 'Grad Celsius'";
@@ -150,8 +229,8 @@
         $command .= " --font WATERMARK:8 ";
         $command .= " --font LEGEND:8:Mono";
         $command .= " --imgformat PNG";
-        //$command .= " DEF:a0=" . constant('RRDFILE') . ":temp:AVERAGE";
         $command .= " DEF:a0=" . constant('RRDFILE') . ":temp:AVERAGE";
+        //$command .= " DEF:a0=db/cputemp.rrd:temp:AVERAGE";
         $command .= " VDEF:a0cur=a0,LAST";
         $command .= " LINE1:a0#0000FF:temp";
 
@@ -159,7 +238,7 @@
         $exec = exec($command, $output, $returnVar);
         if($returnVar == 0)
         {
-            $response = array('status' => 'ok', 'command' => $command);
+            $response = array('status' => 'ok', 'filename' => $filename);
         }
         else
         {
