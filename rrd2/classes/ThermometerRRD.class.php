@@ -50,23 +50,38 @@ class ThermometerRRD
         putenv("TZ=" . date_default_timezone_get());
         $filename = "img/$start.png";
         $now = new DateTime();
+        $gformat = "%2.1lf%s°C\t";
+
         $command  = "rrdtool graph $filename";
         $command .= " --start -$start";
         $command .= " --title 'Temperatur & rel. Luftfeuchte ($start)'";
         $command .= " --vertical-label 'Grad Celsius'";
+        $command .= " --upper-limit 20";
+        $command .= " --lower-limit 0";
         $command .= " --right-axis-label 'Rel %'";
-        $command .= " --right-axis 2:0";
+        $command .= " --right-axis 5:0";
+        $command .= " --slope-mode";
         $command .= sprintf(" --watermark 'created at %s '", $now->format(DateTime::ATOM));
         $command .= " --font WATERMARK:8 ";
         $command .= " --font LEGEND:8:Mono";
         $command .= " --imgformat PNG";
-        $command .= " DEF:a1=" . ThermometerRRD::RRDFILE . ":rh:AVERAGE";
-        $command .= " CDEF:a2=a1,0.5,*";
-        $command .= " VDEF:a1cur=a1,LAST";
-        $command .= " AREA:a2#00ff00:humidity";             
-        $command .= " DEF:a0=" . ThermometerRRD::RRDFILE . ":temp:AVERAGE";
-        $command .= " VDEF:a0cur=a0,LAST";
-        $command .= " LINE1:a0#000000:temperature";
+        //-- humidity first (area in background)
+        $command .= " DEF:a1=" . ThermometerRRD::RRDFILE . ":rh:AVERAGE";       
+        $command .= " CDEF:a2=a1,0.2,*";
+        $command .= " AREA:a2#00ff00:Luftfeuchtigkeit";   
+        //-- temperature          
+        $command .= " DEF:temp0=" . ThermometerRRD::RRDFILE . ":temp:AVERAGE";
+        $command .= " VDEF:temp0cur=temp0,LAST";
+        $command .= " VDEF:temp0max=temp0,MAXIMUM";
+        $command .= " VDEF:temp0avg=temp0,AVERAGE";
+        $command .= " VDEF:temp0min=temp0,MINIMUM"; 
+        $command .= " COMMENT:\"\rCur          Min         Avg          Max     \r\"";
+        $command .= " GPRINT:temp0cur:$gformat";
+        $command .= " GPRINT:temp0min:$gformat";
+        $command .= " GPRINT:temp0avg:$gformat";
+        $command .= " GPRINT:temp0max:$gformat";
+        $command .= " LINE1:temp0#000000:Temperatur";
+        
    
         
         exec($command, $output, $returnVar);
@@ -92,8 +107,9 @@ class ThermometerRRD
 
         $command  = "rrdtool create " .  ThermometerRRD::RRDFILE;
         $command .= " --step 60 ";
-        $command .= "DS:temp:GAUGE:240:U:U ";
-        $command .= "DS:rh:GAUGE:240:10:110 ";
+        // -- updated by: pi@raspberrypi:/var/www/html $ rrdtool tune rrd2/db/temp_rh.rrd -h temp:310
+        $command .= "DS:temp:GAUGE:310:U:U ";
+        $command .= "DS:rh:GAUGE:310:10:110 ";
         $command .= "RRA:AVERAGE:0.5:1:1440 ";
         $command .= "RRA:AVERAGE:0.5:30:432 ";
         $command .= "RRA:AVERAGE:0.5:120:540 ";
