@@ -4,6 +4,7 @@ class HTTPResponse
     const ContentType = "Content-Type: application/json";
     const AccessControl = "Access-Control-Allow-Origin: *";
     const HTTP200 = '200 Ok';
+    const HTTP303 = '303 See Other';
     const HTTP400 = '400 Bad Request';
     const HTTP405 = '405 Method Not Allowed';
     const HTTP418 = '418 I\'m a teapot';
@@ -22,6 +23,13 @@ class HTTPResponse
         echo json_encode($message, JSON_UNESCAPED_SLASHES);
         die;
     }   
+
+    public static function Redirect303($location)
+    {
+        self::SendHeaders(self::HTTP303);
+        header("Location: $location");
+        die;
+    }    
 
     public static function Error400($message)
     {
