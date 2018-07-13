@@ -12,12 +12,6 @@
 
     function Handle($request)
     {
-        /*
-        $logdate = new DateTime();
-        $debug = print_r($request->__debugInfo(), true);
-        $logEntry = $logdate->format(DateTime::ATOM) . ": $debug " . PHP_EOL;
-        file_put_contents("/var/www/html/rrd2/debug.log", $logEntry, FILE_APPEND);
-        */
         switch ($request->getMethod()) 
         { 
             // ==
@@ -59,7 +53,26 @@
             // == RRDLastUpdate
             // ==
             case 'GET':
-                $response = ThermometerRRD::GetLastUpdate();
+                $img = $request->getQueryParam('img'); 
+                if($img != null)
+                {
+                    $start = str_replace(".png", "", $img);
+                    //DebugLog($start);
+                    $response = ThermometerRRD::CreateGraph($start);
+                    if($response['status'] == "ok")
+                    {
+                        $url = sprintf("http://%s%s/%s",
+                            $_SERVER['SERVER_ADDR'],
+                            dirname($_SERVER['REQUEST_URI']),
+                            $response['filename']);
+                        
+                        HTTPResponse::Redirect303($url);
+                    }                    
+                }
+                else
+                {
+                    $response = ThermometerRRD::GetLastUpdate();
+                }
                 if($response['status'] == "ok")
                 {
                     HTTPResponse::Ok200($response['lastupdate']);
@@ -129,5 +142,12 @@
         }
 
         return true;
+    }
+
+    function DebugLog($debug)
+    {
+        $logdate = new DateTime();
+        $logEntry = $logdate->format(DateTime::ATOM) . ": $debug " . PHP_EOL;
+        file_put_contents("/var/www/html/rrd2/debug.log", $logEntry, FILE_APPEND);
     }
 ?>
