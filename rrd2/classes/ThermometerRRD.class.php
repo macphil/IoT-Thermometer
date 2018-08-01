@@ -51,7 +51,7 @@ class ThermometerRRD
     }
 
 
-    public static function GetGraph($start)
+    public static function GetGraph($start, $title)
     {
         // --
         // see https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html
@@ -64,7 +64,7 @@ class ThermometerRRD
 
         $command  = "rrdtool graph $filename";
         $command .= " --start -$start";
-        $command .= " --title 'Temperatur & rel. Luftfeuchte ($start)'";
+        $command .= " --title 'Temperatur & rel. Luftfeuchte ($title)'";
         $command .= " --vertical-label 'Grad Celsius'";
         $command .= " --upper-limit 20";
         $command .= " --lower-limit 0";
@@ -126,7 +126,7 @@ class ThermometerRRD
         $command .= "RRA:MIN:0.5:1440:450 ";
 
         
-        //exec($command, $output, $returnVar);
+        exec($command, $output, $returnVar);
         if($returnVar == 0)
         {
             $response = array('status' => 'ok', 'command' => $command);

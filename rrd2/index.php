@@ -53,16 +53,18 @@
             // == RRDLastUpdate / RRDGraph
             // ==
             case 'GET':
-                $img = $request->getQueryParam('img'); 
-                if($img != null)
+                $start = $request->getQueryParam('start'); 
+                if($start != null)
                 {
-                    $start = str_replace(".png", "", $img);
-                    //DebugLog($start);
+                    $start = str_replace(".png", "", $start);
+                    $parsedInterval = ParseAmountAndUnitFromTimeInterval($start);
+
                     header("HTTP/1.0 200 Ok");
                     header("Content-Type: image/png");
-                    ThermometerRRD::GetGraph($start);              
+                    ThermometerRRD::GetGraph($parsedInterval['timeInterval'], $parsedInterval['title']);
+                    break;                          
                 }
-                            
+
                 $response = ThermometerRRD::GetLastUpdate();                
                 if($response['status'] == "ok")
                 {
@@ -110,6 +112,69 @@
         }
 
         return true;
+    }
+
+    function ParseAmountAndUnitFromTimeInterval($timeInterval)
+    {
+        $returnValue = array('timeInterval' => '1h', 'amount' => '1', 'unit' => 'h', 'title' => 'letzte Stunde');
+
+        $pattern = "/([1-9]{1,}[0-9]*)([A-Za-z]{1,})/";
+        if(preg_match($pattern, $timeInterval, $splitted) == 1)
+        {
+            $amount = $splitted[1];
+            $unit =  $splitted[2];   
+            switch ($splitted[2]) {
+                case 's':
+                case 'second':
+                case 'seconds':
+                    $title =  $amount==1?"letzte Sekunde" : sprintf("letzte %d Sekunden", $amount);
+                    break;
+
+                case 'h':
+                case 'hour':
+                case 'hours':
+                    $title =  $amount==1?"letzte Stunde" : sprintf("letzte %d Stunden", $amount);
+                    break;
+
+                case 'm':
+                case 'minute':
+                case 'minutes':
+                    $title =  $amount==1?"letzte Minute" : sprintf("letzte %d Minuten", $amount);
+                    $unit = "minute";
+                    break;
+
+                case 'd':
+                case 'day':
+                case 'days':
+                    $title =  $amount==1?"letzter Tag" : sprintf("letzte %d Tage", $amount);
+                    break;
+
+                case 'w':
+                case 'week':
+                case 'weekss':
+                    $title =  $amount==1?"letzte Woche" : sprintf("letzte %d Wochen", $amount);
+                    break;
+
+                case 'M':
+                case 'month':
+                case 'months':
+                    $title =  $amount==1?"letzter Monat" : sprintf("letzte %d Monate", $amount);
+                    $unit = "month";
+                    break;                    
+
+                case 'y':
+                case 'year':
+                case 'years':
+                    $title =  $amount==1?"letztes Jahr" : sprintf("letzte %d Jahre", $amount);
+                    break;                    
+                default:
+                    $title = $splitted[0];
+                    break;
+            }
+
+            $returnValue =  array('timeInterval' => $splitted[0], 'amount' => $amount, 'unit' => $unit, 'title' => $title);
+        }
+        return $returnValue;
     }
 
     function DebugLog($debug)
