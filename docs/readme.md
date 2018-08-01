@@ -33,6 +33,34 @@ Nun muss ich mir eine sinvolle Ordnerstruktur überlegen.
 
 
 
+## Ordnerstruktur
+
+### Vorschlag
+
+.
+├── index.html
+├── resources
+│   ├── fetch.js
+│   ├── thermometer.css
+│   ├── textured-sand-paper-of-green-color.jpg
+│   ├── DSEG14Modern-Italic.woff
+│   ├── DSEG7Modern-BoldItalic.woff
+│   └── DSEG7Modern-Italic.woff
+├── doc
+└── rrd
+    ├── rrdrest.php
+    ├── classes
+    │   ├── HTTPResponse.class.php
+    │   ├── ThermometerRRD.class.php
+    │   └── Request.class.php
+    └── db
+        ├── cpu.rrd
+        └── terrasse.rrd
+     
+
+
+
+
 # Use-Cases
 
 Nagt, es sind keine Use-Cases in strengen UML-Sinne, aber es beschreibt, wie die Komponenten zusammenarbeiten sollen.
@@ -63,7 +91,11 @@ Wenn die entsprechende Webseite aufgerufen wird, wird mittels [JavaScript Fetch]
 
 ## Grafiken erstellen
 
-Per crnjob (z.B. alle 5 Minuten) wird die Generierung der Verlaufsgrafik angestoßen
+~~Per crnjob (z.B. alle 5 Minuten) wird die Generierung der Verlaufsgrafik angestoßen~~
+
+Besser nur bei Bedarf und direkt an den Browser per passthru
+
+
 
 ![iott_put](iott_put.png)
 
