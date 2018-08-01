@@ -5,6 +5,9 @@ class ThermometerRRD
     
     public static function Update($temperature,  $humidity, $timesstamp = 0)
     {
+        // --
+        // see https://oss.oetiker.ch/rrdtool/doc/rrdupdate.en.html
+        // --
         if($timesstamp == 0)
         {
             $timesstamp = time();
@@ -26,6 +29,9 @@ class ThermometerRRD
 
     public static function GetLastUpdate()
     {
+        // --
+        // see https://oss.oetiker.ch/rrdtool/doc/rrdlastupdate.en.html
+        // --
         $command = "rrdtool lastupdate " . ThermometerRRD::RRDFILE;
         
         exec($command, $output, $returnVar);
@@ -45,10 +51,14 @@ class ThermometerRRD
     }
 
 
-    public static function CreateGraph($start)
+    public static function GetGraph($start)
     {
-        putenv("TZ=" . date_default_timezone_get());
-        $filename = "img/$start.png";
+        // --
+        // see https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html
+        // --              
+        putenv("TZ=" . date_default_timezone_get());   
+        
+        $filename = "-"; // filename can be '-' to send the image to stdout. In this case, no other output is generated.
         $now = new DateTime();
         $gformat = "%2.1lf%s°C\t";
 
@@ -82,24 +92,16 @@ class ThermometerRRD
         $command .= " GPRINT:temp0max:$gformat";
         $command .= " LINE1:temp0#000000:Temperatur";
         
-   
-        
-        exec($command, $output, $returnVar);
-        if($returnVar == 0)
-        {
-            $response = array('status' => 'ok', 'filename' => $filename);
-        }
-        else
-        {
-            $response = array('status' => 'error', 'returnVar' => $returnVar, 'command' => $command, 'output' => $output);
-        }
-        
-        return $response;
+        passthru($command);
+        exit();
     }
 
 
     public static function CreateRRD()
     {
+        // --
+        // see https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+        // --
         if(!is_writable(ThermometerRRD::RRDFILE))
         {
             $response = array('status' => 'error', 'msg' => ThermometerRRD::RRDFILE . " is not writable!");

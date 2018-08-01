@@ -50,7 +50,7 @@
                 }                
                 // no break to return last update
             // ==
-            // == RRDLastUpdate
+            // == RRDLastUpdate / RRDGraph
             // ==
             case 'GET':
                 $img = $request->getQueryParam('img'); 
@@ -58,51 +58,19 @@
                 {
                     $start = str_replace(".png", "", $img);
                     //DebugLog($start);
-                    $response = ThermometerRRD::CreateGraph($start);
-                    if($response['status'] == "ok")
-                    {
-                        $url = sprintf("http://%s%s/%s",
-                            $_SERVER['SERVER_ADDR'],
-                            dirname($_SERVER['REQUEST_URI']),
-                            $response['filename']);
-                        
-                        HTTPResponse::Redirect303($url);
-                    }                    
+                    header("HTTP/1.0 200 Ok");
+                    header("Content-Type: image/png");
+                    ThermometerRRD::GetGraph($start);              
                 }
-                else
-                {
-                    $response = ThermometerRRD::GetLastUpdate();
-                }
+                            
+                $response = ThermometerRRD::GetLastUpdate();                
                 if($response['status'] == "ok")
                 {
                     HTTPResponse::Ok200($response['lastupdate']);
                 }
+                
                 HTTPResponse::Error500($response);   
                 break;                
-            // ==
-            // == RRDGraph
-            // ==
-            case 'PUT':
-                if($request->isJson())
-                {
-                    $start = $request->getContent()['start'];
-                    if($start == null)
-                    {
-                        $start = "1h";
-                    }
-                }            
-                $response = ThermometerRRD::CreateGraph($start);
-                if($response['status'] == "ok")
-                {
-                    $url = sprintf("http://%s%s/%s",
-                        $_SERVER['SERVER_ADDR'],
-                        dirname($_SERVER['REQUEST_URI']),
-                        $response['filename']);
-                    
-                    HTTPResponse::Ok200(array("status" => "ok", "url" => $url));
-                }
-                HTTPResponse::Error500($response);       
-                break;
             // ==
             // == RRDCreate
             // ==
@@ -126,7 +94,7 @@
                 HTTPResponse::Error418($request->__debugInfo());
                 break;               
             default:
-                HTTPResponse::Error405("GET, POST, PUT, PATCH");
+                HTTPResponse::Error405("GET, POST, PATCH");
                 break;
         }
     }

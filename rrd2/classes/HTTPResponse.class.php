@@ -22,7 +22,7 @@ class HTTPResponse
         self::SendHeaders(self::HTTP200);
         echo json_encode($message, JSON_UNESCAPED_SLASHES);
         die;
-    }   
+    }    
 
     public static function Redirect303($location)
     {
