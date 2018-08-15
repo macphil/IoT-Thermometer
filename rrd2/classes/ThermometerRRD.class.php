@@ -60,11 +60,12 @@ class ThermometerRRD
         
         $filename = "-"; // filename can be '-' to send the image to stdout. In this case, no other output is generated.
         $now = new DateTime();
-        $gformat = "%2.1lf%s°C\t";
+        $gformat = "%6.1lf%s°C";
 
         $command  = "rrdtool graph $filename";
         $command .= " --start -$start";
         $command .= " --title 'Temperatur & rel. Luftfeuchte ($title)'";
+        $command .= " --width 600 --height 300";
         $command .= " --vertical-label 'Grad Celsius'";
         $command .= " --upper-limit 20";
         $command .= " --lower-limit 0";
@@ -75,22 +76,43 @@ class ThermometerRRD
         $command .= " --font WATERMARK:8 ";
         $command .= " --font LEGEND:8:Mono";
         $command .= " --imgformat PNG";
-        //-- humidity first (area in background)
-        $command .= " DEF:a1=" . ThermometerRRD::RRDFILE . ":rh:AVERAGE";       
-        $command .= " CDEF:a2=a1,0.2,*";
-        $command .= " AREA:a2#00ff00:Luftfeuchtigkeit";   
+        //-- humidity
+        $command .= " DEF:rh1=" . ThermometerRRD::RRDFILE . ":rh:AVERAGE";       
+        $command .= " CDEF:rh1area=rh1,0.2,*";
+        $command .= " VDEF:rh1cur=rh1,LAST";
+        $command .= " VDEF:rh1max=rh1,MAXIMUM";
+        $command .= " VDEF:rh1avg=rh1,AVERAGE";
+        $command .= " VDEF:rh1min=rh1,MINIMUM";         
         //-- temperature          
         $command .= " DEF:temp0=" . ThermometerRRD::RRDFILE . ":temp:AVERAGE";
         $command .= " VDEF:temp0cur=temp0,LAST";
         $command .= " VDEF:temp0max=temp0,MAXIMUM";
         $command .= " VDEF:temp0avg=temp0,AVERAGE";
         $command .= " VDEF:temp0min=temp0,MINIMUM"; 
-        $command .= " COMMENT:\"\rCur          Min         Avg          Max     \r\"";
+        
+        $command .= " COMMENT:\"\r\t\t    \"";
+        $command .= " COMMENT:\"last     \"";
+        $command .= " COMMENT:\"mimimum  \"";
+        $command .= " COMMENT:\"average  \"";
+        $command .= " COMMENT:\"maximum  \"";
+        $command .= " COMMENT:\"\r\l\"";     
+        //-- humidity first (area in background)
+        $command .= " AREA:rh1area#00ff00:Luftfeuchtigkeit";   
+        $command .= " COMMENT:\"\"";               
+        $command .= " GPRINT:rh1cur:$gformat";
+        $command .= " GPRINT:rh1min:$gformat";
+        $command .= " GPRINT:rh1avg:$gformat";
+        $command .= " GPRINT:rh1max:$gformat";
+        $command .= " COMMENT:\"\l\"";        
+        
+        $command .= " LINE1:temp0#000000:Temperatur";
+        $command .= " COMMENT:\"    \"";        
         $command .= " GPRINT:temp0cur:$gformat";
         $command .= " GPRINT:temp0min:$gformat";
         $command .= " GPRINT:temp0avg:$gformat";
         $command .= " GPRINT:temp0max:$gformat";
-        $command .= " LINE1:temp0#000000:Temperatur";
+        $command .= " COMMENT:\"\l\"";
+        
         
         passthru($command);
         exit();
