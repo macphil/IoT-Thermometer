@@ -1,0 +1,199 @@
+html {
+	box-sizing: border-box;
+}
+
+*,
+::before,
+::after {
+	box-sizing: inherit;
+}
+
+body {
+	margin: 10px auto;
+	font-family: sans-serif;
+	color: #333333;
+    background-color: lightgrey;
+}
+
+header,
+nav,
+nav a,
+article,
+section,
+aside,
+footer {
+	border-radius: 0.5em;
+	border: 1px solid;
+	padding: 10px;
+}
+
+header {
+	background: #F1F3F4;
+	border-color: #d5d5d5;
+}
+
+nav {
+	font-size: 0.91em;
+	padding: 0;
+	background: #fffbf0;
+	border-color: #e7c157;
+}
+
+
+nav th {
+    text-align: left;
+}
+
+
+main {
+
+	/* Mindestbreite (der Ueberschrift) verhindert Anzeigefehler in modernen Browsern */
+}
+
+section {
+	background: #F1F3F4;
+	border-color: slateblue;
+}
+
+article {
+	background: #ffede0;
+	border-color: #df6c20;
+}
+
+aside {
+	background: #ebf5d7;
+	border-color: #8db243;
+}
+
+footer {
+	background: #e4ebf2;
+	border-color: #8a9da8;
+    visibility: hidden;
+}
+
+footer p {
+	float: right;
+	margin: 0;
+}
+
+
+
+@font-face {
+  font-family: "D7MI";
+  src: url("DSEG7Modern-Italic.woff") format('woff');
+}
+
+@font-face {
+  font-family: "D7MBI";
+  src: url("DSEG7Modern-BoldItalic.woff") format('woff');
+}
+
+@font-face {
+  font-family: "D14MI";
+  src: url("DSEG14Modern-Italic.woff") format('woff');
+}
+.D7MI {
+font-family: "D7MI";
+}
+
+.D7MBI {
+font-family: "D7MBI";
+}
+
+.D14MI {
+font-family: "D14MI";
+}
+
+.Display-Frame{
+	position:relative;
+	border:6px solid #000;
+	border-radius:9px;
+	height:400px;
+	width:400px;
+	background-image: url("textured-sand-paper-of-green-color.jpg");
+	box-shadow: 4px 4px 1px 0px rgba(0,0,0,0.1) inset;
+}
+
+.Display-Time-Background{
+	z-index:50;
+	position:absolute;
+	top:13px;
+	left:220px;
+	color:rgba(0,0,0,0.1);
+	font-size:35px;
+}
+
+.Display-Time-Front{
+	z-index:100;
+	position:absolute;
+	top:13px;
+	left:220px;
+	font-size:35px;
+	text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+
+.Display-Temperature-Background{
+	z-index:50;
+	position:absolute;
+	top:70px;
+	left:6px;
+	color:rgba(0,0,0,0.08);
+	font-size:90px;
+}
+
+.Display-Temperature-Front{
+	z-index:100;
+	position:absolute;
+	top:70px;
+	left:6px;
+	font-size:90px;
+    text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+
+.Display-Temperature-Unit{
+   	z-index:101;
+	position:absolute;
+	top:70px;
+	left:300px;
+    font-size:30px;
+	text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+
+.Display-Humidity-Background{
+	z-index:50;
+	position:absolute;
+	top:200px;
+	left:170px;
+	color:rgba(0,0,0,0.08);
+	font-size:50px;
+}
+
+.Display-Humidity-Front{
+	z-index:100;
+	position:absolute;
+	top:200px;
+	left:170px;
+	font-size:50px;
+    text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+
+.Display-Humidity-Unit{
+   	z-index:101;
+	position:absolute;
+	top:200px;
+	left:300px;
+    font-size:20px;
+	text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+
+@media (min-width: 32em) {
+	/* mehrspaltiges Layout für breitere Viewports */
+
+	nav {
+		float: left;
+		width: 15em;
+	}
+	main {
+		margin-left: 15em;
+	}
+}

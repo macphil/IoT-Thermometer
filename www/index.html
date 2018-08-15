@@ -1,0 +1,37 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Thermometer</title>
+    <link rel="stylesheet" href="ressources/thermometer.css">
+    <script src="ressources/fetch.js"></script>
+  </head>
+  <body>
+      <main>
+        <div class="center">
+            <div class="Display-Frame">
+                <span class="Display-Time-Background D7MI">88:88</span>
+                <span class="Display-Time-Front D7MI" id="logTime" ></span>
+                <span class="Display-Temperature-Background D7MBI">-88.8</span>
+                <span class="Display-Temperature-Front D7MBI" id="logTemp" ></span>
+                <span class="Display-Temperature-Unit">°C</span>
+                <span class="Display-Humidity-Background D7MBI">88</span>
+                <span class="Display-Humidity-Front D7MBI" id="logHum"></span>
+                <span class="Display-Humidity-Unit">%</span>
+            </div>   
+            <div class="graph-frame">
+                    <!--img src="/rrd2/img/2h.png" width="497" height="203"-->
+                </div>         
+            <div class="json-frame">
+                JSON-Response:
+                <pre id="code">(code)</pre>
+            </div>
+        </div>
+      </main>
+        <footer id="footer">
+            <ul class="copyright">
+                <li>&copy; Philip</li>
+            </ul>
+        </footer>
+  </body>
