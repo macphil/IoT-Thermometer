@@ -1,0 +1,3 @@
+@HOST = pizero.fritz.box
+#
+GET http://{{HOST}}/rrd-api/

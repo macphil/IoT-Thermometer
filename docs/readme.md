@@ -6,7 +6,7 @@ Ich war auf der Suche nach einem Hobbyprojekt, bei dem ich einige, für mich neu
 
 Bei der Arbeit auf der Terasse kam mir der Gedanke, ob ich nicht ein Thermometer dort aufstellen könnte und jederzeit per Handy die dortigen Werte (Temperatur und Luftfeuchtigkeit) abrufen könne, um z.B. zu entscheiden, dass ich besser im Wohnzimmer bleibe.
 
-(Ok, man könnte auch einfach herausgehen, aber ...)
+(Ok, man könnte auch einfach herausgehen, aber ...) 
 
 Mir ist völlig klar, dass es bereits unzählige dieser oder ähnlicher Projekte gibt (was ja auch ein Vorteil ist, da ich dann ja irgendwo nachschauen kann).
 
@@ -15,7 +15,7 @@ Mir ist völlig klar, dass es bereits unzählige dieser oder ähnlicher Projekte
 Bei folgenden Themen möchte ich mein Wissen / Erfahrungen aufbessern bzw. vertiefen:
 
 - Softwarethemen
-  - [PHP 7.\*](https://www.heise.de/developer/artikel/PHP-7-Skriptsprache-kommt-in-der-Gegenwart-an-3015929.html?seite=all)
+  - [PHP 7.*](https://www.heise.de/developer/artikel/PHP-7-Skriptsprache-kommt-in-der-Gegenwart-an-3015929.html?seite=all)
   - [REST](https://de.wikipedia.org/wiki/Representational_State_Transfer)
   - [RRDtool](https://oss.oetiker.ch/rrdtool/)
   - [GitHub Pages](https://pages.github.com/)
@@ -31,11 +31,12 @@ Zuerst habe ich für einige Dinge per Prototyping die Machbarkeit geprüft.
 
 Nun muss ich mir eine sinvolle Ordnerstruktur überlegen.
 
+
+
 ## Ordnerstruktur
 
 ### Vorschlag
 
-```
 .
 ├── index.html
 ├── resources
@@ -55,7 +56,10 @@ Nun muss ich mir eine sinvolle Ordnerstruktur überlegen.
     └── db
         ├── cpu.rrd
         └── terrasse.rrd
-```
+     
+
+
+
 
 # Use-Cases
 
@@ -70,18 +74,20 @@ Alle 60 Sekunden ermittelt der ESP8226 mithilfe des DHT22 die aktuelle Temperatu
 ### JSON
 
 ```json
-{
-  "name": "DHT22_1",
-  "temperature": "28.8",
-  "humidity": "46.2"
+{ 
+	"name" : "DHT22_1", 
+	"temperature" : "28.8", 
+	"humidity" : "46.2" 
 }
 ```
 
+
+
 ## letzte Temperatur anzeigen
 
-Wenn die entsprechende Webseite aufgerufen wird, wird mittels [JavaScript Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) ein asynchroner Request abgesetzt, welcher ein Json zurückbekommt. So aktualisiert sich die Webseite neu, wobei nur das kleine Json neu abgerufen werden muss.
+Wenn die entsprechende Webseite aufgerufen wird, wird mittels [JavaScript Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) ein asynchroner Request abgesetzt, welcher ein Json zurückbekommt. So aktualisiert sich die Webseite neu, wobei nur das kleine Json neu abgerufen werden muss. 
 
-![iott_get](iott_get.png)
+ ![iott_get](iott_get.png)
 
 ## Grafiken erstellen
 
@@ -89,6 +95,11 @@ Wenn die entsprechende Webseite aufgerufen wird, wird mittels [JavaScript Fetch]
 
 Besser nur bei Bedarf und direkt an den Browser per passthru
 
+
+
 ![iott_put](iott_put.png)
 
-[^1]: Wenn ich von Temperatur rede, gilt dies üblicherweise ebenso auch für die Luftfeuchtigkeit, welcher der Sensor ebenfalls ermittelt
+
+
+
+[^1]: Wenn ich von Temperatur rede, gilt dies üblicherweise ebenso auch für die Luftfeuchtigkeit, welcher der Sensor ebenfalls ermittelt   
