@@ -34,31 +34,9 @@ Nun muss ich mir eine sinvolle Ordnerstruktur überlegen.
 
 
 ## Ordnerstruktur
+Nachdem mit anfang 2021 tatsächlich der erste ESP8266 witterungsbedingt den Geist aufgegeben hat, habe ich ein wenig an der Struktur gearbeitet und nun Doku und Implementierung getrennt.
 
-### Vorschlag
-
-.
-├── index.html
-├── resources
-│   ├── fetch.js
-│   ├── thermometer.css
-│   ├── textured-sand-paper-of-green-color.jpg
-│   ├── DSEG14Modern-Italic.woff
-│   ├── DSEG7Modern-BoldItalic.woff
-│   └── DSEG7Modern-Italic.woff
-├── doc
-└── rrd
-    ├── rrdrest.php
-    ├── classes
-    │   ├── HTTPResponse.class.php
-    │   ├── ThermometerRRD.class.php
-    │   └── Request.class.php
-    └── db
-        ├── cpu.rrd
-        └── terrasse.rrd
-     
-
-
+Die Implementierung ist nun in einem privatem Repository und die Doku (also das hier) in einem öffentlichen Repo - vorallem, um ein wenig mit den Darstellungsoptionen von GitHub & [GitHup-Pages](https://macphil.github.io/IoT-Thermometer/) herumzuspielen.
 
 
 # Use-Cases
@@ -102,4 +80,4 @@ Besser nur bei Bedarf und direkt an den Browser per passthru
 
 
 
-[^1]: Wenn ich von Temperatur rede, gilt dies üblicherweise ebenso auch für die Luftfeuchtigkeit, welcher der Sensor ebenfalls ermittelt
+[^1]: Wenn ich von Temperatur rede, gilt dies üblicherweise ebenso auch für die Luftfeuchtigkeit, welcher der Sensor ebenfalls ermittelt   
